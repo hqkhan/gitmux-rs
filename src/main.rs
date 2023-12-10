@@ -1,5 +1,8 @@
 // use std::fmt;
+mod config;
+
 use clap::Parser;
+use config::Config;
 use std::path::PathBuf;
 // use std::error::Error;
 
@@ -26,19 +29,6 @@ struct Args {
     // exits if still running after given duration (ex: 2s, 500ms).
     // #[arg(long)]
     // timeout: u16,
-}
-
-#[derive(Debug)]
-struct Config {
-    branch: String,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            branch: String::from("⎇ "),
-        }
-    }
 }
 
 #[derive(Debug)]
