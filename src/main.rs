@@ -19,42 +19,57 @@ struct Args {
     /// prints default configuration file.
     #[arg(long)]
     printcfg: bool,
-        
+
     /// outputs Git status as JSON and print errors.
     #[arg(long)]
     dbg: bool,
-
     // exits if still running after given duration (ex: 2s, 500ms).
     // #[arg(long)]
     // timeout: u16,
 }
 
 #[derive(Debug)]
-struct Gitmux {
-   config: serde_yaml::Value 
+struct Config {
+    branch: String,
 }
 
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            branch: String::from("⎇ "),
+        }
+    }
+}
 
-fn read_yaml_content(path_to_file: PathBuf) -> Result<serde_yaml::Value, serde_yaml::Error> {
-    let f = std::fs::File::open(path_to_file).expect(format!("Filepath - {} does not exist or could not be found", path_to_file.display()).as_str());
-    let data: serde_yaml::Value = serde_yaml::from_reader(f)?;
-    dbg!("Read YAML string: {}", data);
-    return Ok(data);
+#[derive(Debug)]
+struct Gitmux {
+    raw_yaml: serde_yaml::Value,
+    statusline: Option<String>,
+    config: Option<Config>,
 }
 
 impl Default for Gitmux {
     fn default() -> Self {
-        if let Some(data) = read_yaml_content(PathBuf::from("default.yaml")) {
-            return Gitmux { config: data };
-        }
-        else {
-            return Gitmux { config: read_yaml_content(PathBuf::from("default.yaml")).unwrap() };
+        Self {
+            raw_yaml: read_yaml_content(&PathBuf::from("default.yaml")).unwrap(),
+            statusline: None,
+            config: None
         }
     }
 }
+
+fn read_yaml_content(path_to_yaml_file: &PathBuf) -> Result<serde_yaml::Value, serde_yaml::Error> {
+    // Path cannot be incorrect
+    let f = std::fs::File::open(path_to_yaml_file).unwrap_or_else(|_| panic!("Filepath - {} does not exist or could not be found", path_to_yaml_file.display()));
+    let data: serde_yaml::Value = serde_yaml::from_reader(f)?;
+    Ok(data)
+}
+
 fn main() {
     let args = Args::parse();
     dbg!(&args);
     // let test = d["tmux"]["styles"]["state"].as_str().unwrap().to_owned();
     // println!("{}", test);
+
+     
 }
